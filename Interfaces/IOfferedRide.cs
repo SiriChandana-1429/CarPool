@@ -5,7 +5,7 @@ namespace Interfaces
 {
     public interface IOfferedRide
     {
-        public Task<ActionResult<OfferedRide>> AddOfferRide(OfferedRide offeredRide);
+        public void AddOfferRide(OfferedRide offeredRide);
         public Task<ActionResult<List<OfferedRide>>> GetOfferRide();
         public Task<ActionResult<OfferedRide>> GetOfferRideById(int id);
         

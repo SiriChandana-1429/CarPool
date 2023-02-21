@@ -28,11 +28,11 @@ namespace WebApplication1.Services
                 return Ok(credentials);
             }
         }
-        public async Task<ActionResult> InsertCredentials(Credentials credentials)
+        public async void InsertCredentials(Credentials credentials)
         {
             _context.Credentials.Add(credentials);
             await _context.SaveChangesAsync();
-            return CreatedAtAction("GetCredentialsId", new { id = credentials.Id }, credentials);
+            //return CreatedAtAction(nameof(GetCredentialsById), new { id = credentials.Id }, credentials);
         }
         public async Task<ActionResult<List<Credentials>>> GetCredentials()
         {

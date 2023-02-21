@@ -32,6 +32,16 @@ namespace WebApplication1.Services
         {
             if (ValidateRide(bookedRide.OfferId))
             {
+                //foreach(var offer in _context.OfferedRides)
+                //{
+                //    if (offer.From == bookedRide.From || offer.Stop1 == bookedRide.From || offer.Stop2 == bookedRide.From || offer.Stop3 == bookedRide.From || offer.Stop4 == bookedRide.From || offer.Stop5 == bookedRide.From)
+                //    {
+                //        if (offer.Stop1 == bookedRide.To || offer.Stop2 == bookedRide.To || offer.Stop3 == bookedRide.To || offer.Stop4 == bookedRide.To || offer.Stop5 == bookedRide.To)
+                //        {
+                //            bookedRide.OfferId = offer.OfferedRideId;
+                //        }
+                //    }
+                //}
                 _context.BookedRides.Add(bookedRide);
                 await _context.SaveChangesAsync();
 

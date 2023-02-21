@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using DatabaseContext;
 using WebApplication1.Models;
+using Interfaces;
 
 namespace WebApplication1.Controllers
 {
@@ -9,44 +8,35 @@ namespace WebApplication1.Controllers
     [ApiController]
     public class OfferedRidesController : ControllerBase
     {
-        private readonly MyDbContext _context;
+        public IOfferedRide offeredRideServices;
 
-        public OfferedRidesController(MyDbContext context)
+        public OfferedRidesController(IOfferedRide offeredRideServices)
         {
-            _context = context;
+            this.offeredRideServices = offeredRideServices;
         }
 
         // GET: api/OfferedRides
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<OfferedRide>>> GetOfferedRides()
+        public async Task<ActionResult<List<OfferedRide>>> GetOfferedRides()
         {
-            return await _context.OfferedRides.ToListAsync();
+            return await offeredRideServices.GetOfferRide();
         }
 
         // GET: api/OfferedRides/5
         [HttpGet("{id}")]
         public async Task<ActionResult<OfferedRide>> GetOfferedRide(int id)
         {
-            var offeredRide = await _context.OfferedRides.FindAsync(id);
 
-            if (offeredRide == null)
-            {
-                return NotFound();
-            }
-
-            return offeredRide;
+            return await offeredRideServices.GetOfferRideById(id);
         }
 
 
         // POST: api/OfferedRides
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<OfferedRide>> PostOfferedRide(OfferedRide offeredRide)
+        public void PostOfferedRide(OfferedRide offeredRide)
         {
-            _context.OfferedRides.Add(offeredRide);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetOfferedRide", new { id = offeredRide.Id }, offeredRide);
+            offeredRideServices.AddOfferRide(offeredRide);
         }
 
         

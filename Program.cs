@@ -15,12 +15,10 @@ builder.Services.AddDbContext<MyDbContext>(opt =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-void ConfigureServices(IServiceCollection services)
-{
-    services.AddScoped<ICredentials, CredentialServices>();
-    services.AddScoped<IBookedRide, BookedRideServices>();
-    services.AddScoped<IOfferedRide, OfferedRideServices>();
-}
+builder.Services.AddScoped<ICredentials, CredentialServices>();
+builder.Services.AddScoped<IBookedRide, BookedRideServices>();
+builder.Services.AddScoped<IOfferedRide, OfferedRideServices>();
+
 
 var app = builder.Build();
 

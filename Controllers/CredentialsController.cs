@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using DatabaseContext;
 using WebApplication1.Models;
+using Interfaces;
 
 namespace WebApplication1.Controllers
 {
@@ -9,41 +8,35 @@ namespace WebApplication1.Controllers
     [ApiController]
     public class CredentialsController : ControllerBase
     {
-        private readonly MyDbContext _context;
+       
+        public ICredentials credentialServices;
 
-        public CredentialsController(MyDbContext context)
+        public CredentialsController(ICredentials credentialServices)
         {
-            _context = context;
+            
+            this.credentialServices = credentialServices;
+
         }
 
         // GET: api/Credentials
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Credentials>>> GetCredentials()
+        public async Task<ActionResult<List<Credentials>>> GetCredentials()
         {
-            return await _context.Credentials.ToListAsync();
+            return await credentialServices.GetCredentials();
         }
 
         // GET: api/Credentials/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Credentials>> GetCredentials(int id)
         {
-            var credentials = await _context.Credentials.FindAsync(id);
-
-            if (credentials == null)
-            {
-                return NotFound();
-            }
-
-            return credentials;
+            return await credentialServices.GetCredentialsById(id);
         }
 
         [HttpPost("signup")]
-        public async Task<ActionResult<Credentials>> PostCredentials(Credentials credentials)
+        
+        public void PostCredentials(Credentials credentials)
         {
-            _context.Credentials.Add(credentials);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetCredentialsId", new { id = credentials.Id }, credentials);
+            credentialServices.InsertCredentials(credentials);
         }
 
 
@@ -53,15 +46,7 @@ namespace WebApplication1.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<Credentials>> ValidateCredentials(Credentials credentials)
         {
-            var check=_context.Credentials.Where(i=>i.Email.Equals(credentials.Email) && (i.Password.Equals(credentials.Password)));
-            if (!check.Any())
-            {
-                return NotFound();
-            }
-            else
-            {
-                return Ok(credentials);
-            }
+            return await credentialServices.ValidateCredentials(credentials);
         }
 
         

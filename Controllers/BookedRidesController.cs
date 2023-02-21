@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using DatabaseContext;
 using WebApplication1.Models;
-using WebApplication1.Services;
+using Interfaces;
 
 namespace WebApplication1.Controllers
 {
@@ -10,32 +8,26 @@ namespace WebApplication1.Controllers
     [ApiController]
     public class BookedRidesController : ControllerBase
     {
-        private readonly MyDbContext _context;
+        
+        public IBookedRide bookedRideServices;
 
-        public BookedRidesController(MyDbContext context)
-        {
-            _context = context;
+        public BookedRidesController(IBookedRide bookedRideServices)
+        {     
+            this.bookedRideServices=bookedRideServices;
         }
 
         // GET: api/BookedRides
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<BookedRide>>> GetBookedRides()
+        public async Task<ActionResult<List<BookedRide>>> GetBookedRides()
         {
-            return await _context.BookedRides.ToListAsync();
+            return await bookedRideServices.GetAllRides();
         }
 
         // GET: api/BookedRides/5
         [HttpGet("{id}")]
         public async Task<ActionResult<BookedRide>> GetBookedRide(int id)
         {
-            var bookedRide = await _context.BookedRides.FindAsync(id);
-
-            if (bookedRide == null)
-            {
-                return NotFound();
-            }
-
-            return bookedRide;
+            return await bookedRideServices.GetRideById(id);
         }
 
 

@@ -11,16 +11,17 @@ namespace WebApplication1.Services
     {
         private readonly MyDbContext _context;
 
-        public OfferRideServices(MyDbContext context)
+        public OfferedRideServices(MyDbContext context)
         {
             _context = context;
         }
-        public async Task<ActionResult<OfferedRide>> AddOfferRide(OfferedRide offeredRide)
+        public async void AddOfferRide(OfferedRide offeredRide)
         {
+            offeredRide.AccomodatedString = String.Concat(Enumerable.Repeat(offeredRide.NoOfSeats.ToString(), 4));
             _context.OfferedRides.Add(offeredRide);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetOfferedRide", new { id = offeredRide.Id }, offeredRide);
+           // return CreatedAtAction("GetOfferedRide", new { id = offeredRide.Id }, offeredRide);
         }
         public async Task<ActionResult<List<OfferedRide>>> GetOfferRide()
         {
