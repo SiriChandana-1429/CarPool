@@ -1,12 +1,10 @@
 ﻿using DatabaseContext;
 using Interfaces;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using WebApplication1.Models;
 
 namespace WebApplication1.Services
 {
-    public class BookedRideServices:ControllerBase,IBookedRide
+    public class BookedRideServices:IBookedRide
     {
         private readonly MyDbContext _context;
 
@@ -28,49 +26,86 @@ namespace WebApplication1.Services
             }
 
         }
-        public async Task<ActionResult<BookedRide>> AddBookRide(BookedRide bookedRide)
+        public BookedRide AddBookRide(BookedRide bookedRide)
         {
+            bool Flag = true;
+            char currentSeats;
             if (ValidateRide(bookedRide.OfferId))
             {
-                //foreach(var offer in _context.OfferedRides)
-                //{
-                //    if (offer.From == bookedRide.From || offer.Stop1 == bookedRide.From || offer.Stop2 == bookedRide.From || offer.Stop3 == bookedRide.From || offer.Stop4 == bookedRide.From || offer.Stop5 == bookedRide.From)
-                //    {
-                //        if (offer.Stop1 == bookedRide.To || offer.Stop2 == bookedRide.To || offer.Stop3 == bookedRide.To || offer.Stop4 == bookedRide.To || offer.Stop5 == bookedRide.To)
-                //        {
-                //            bookedRide.OfferId = offer.OfferedRideId;
-                //        }
-                //    }
-                //}
-                _context.BookedRides.Add(bookedRide);
-                await _context.SaveChangesAsync();
-
-                return CreatedAtAction("GetBookedRide", new { id = bookedRide.Id }, bookedRide);
+                int FromStop= (int)Enum.Parse(typeof(Stop),bookedRide.From);
+                int ToStop = (int)Enum.Parse(typeof(Stop), bookedRide.To);
+                foreach(var offer in _context.OfferedRides)
+                {
+                    if (offer.AccomodatedString.Length < ToStop)
+                    {
+                        break;
+                    }
+                    foreach(char seat in offer.AccomodatedString.Substring(FromStop, ToStop))
+                    {
+                        if ((int)seat < bookedRide.seats)
+                        {
+                            Flag = false;
+                            break;
+                        }
+                        currentSeats = seat;
+                    }
+                    if (Flag)
+                    {
+                        string changedSeats = String.Concat(Enumerable.Repeat(offer.AccomodatedString[FromStop].ToString(), ToStop-FromStop));
+                        string currentAccomodatedString = offer.AccomodatedString.Substring(0, FromStop)+changedSeats+offer.AccomodatedString.Substring(ToStop,offer.AccomodatedString.Length-1);
+                        offer.AccomodatedString = currentAccomodatedString;
+                        _context.BookedRides.Add(bookedRide);
+                        _context.SaveChangesAsync();
+                        return bookedRide;
+                    }
+                }
+                return null;
+                
             }
             else
             {
-                return BadRequest();
+                return null;
             }
         }
-        public async Task<ActionResult<List<BookedRide>>> GetAllRides()
+        public List<BookedRide> GetAllRides()
         {
-            return await _context.BookedRides.ToListAsync();
+            return _context.BookedRides.ToList();
         }
-        public async Task<ActionResult<BookedRide>> GetRideById(int id)
+        public BookedRide GetRideById(int id)
         {
             if (_context.BookedRides == null)
             {
-                return NotFound();
+                return null;
             }
-            var check = await _context.BookedRides.FindAsync(id);
+            var check = _context.BookedRides.Find(id);
             if (check == null)
             {
-                return NotFound();
+                return null;
             }
             else
             {
                 return check;
             }
+        }
+        public bool IsInPath(string path,string requiredPath)
+        {
+            
+            foreach (OfferedRide offer in _context.OfferedRides)
+            {
+                string[] IntermediateStopsArray=offer.IntermediateStops.Split( ",");
+                string completePath = offer.From;
+                for(int i=0;i<IntermediateStopsArray.Length;i++) 
+                {
+                    completePath += IntermediateStopsArray[i].ToString();
+                }
+                completePath += offer.To;
+                if (completePath.Contains(requiredPath))
+                {
+                    return true;
+                }
+               
+            }
+            return false;
         }
 
     }

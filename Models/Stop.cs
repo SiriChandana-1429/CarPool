@@ -2,9 +2,10 @@
 {
     public class Stop
     {
-        enum Stops
+ 
+        public enum Stops
         {
-            one=1,
+            one,
             two,
             three,
             four,

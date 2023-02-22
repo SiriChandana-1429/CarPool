@@ -5,11 +5,11 @@ namespace Interfaces
 {
     public interface ICredentials
     {
-        public Task<ActionResult<Credentials>> ValidateCredentials(Credentials credentials);
+        public Credentials ValidateCredentials(Credentials credentials);
         public void InsertCredentials(Credentials credentials);
-        public Task<ActionResult<List<Credentials>>> GetCredentials();
-        public Task<ActionResult> UpdateCredentials(Credentials credentials,int id);
-        public Task<ActionResult> DeleteCredentials(int id);
-        public Task<ActionResult<Credentials>> GetCredentialsById(int id);
+        public List<Credentials> GetCredentials();
+        public bool UpdateCredentials(Credentials credentials,int id);
+        public bool DeleteCredentials(int id);
+        public Credentials GetCredentialsById(int id);
     }
 }

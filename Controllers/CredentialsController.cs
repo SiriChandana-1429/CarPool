@@ -22,14 +22,22 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Credentials>>> GetCredentials()
         {
-            return await credentialServices.GetCredentials();
+            if(credentialServices.GetCredentials() == null) 
+            {
+                return NotFound();
+            }
+            return Ok(credentialServices.GetCredentials());
         }
 
         // GET: api/Credentials/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Credentials>> GetCredentials(int id)
         {
-            return await credentialServices.GetCredentialsById(id);
+            if (credentialServices.GetCredentialsById == null)
+            {
+                return NotFound();
+            }
+            return Ok(credentialServices.GetCredentialsById(id));
         }
 
         [HttpPost("signup")]
@@ -37,6 +45,7 @@ namespace WebApplication1.Controllers
         public void PostCredentials(Credentials credentials)
         {
             credentialServices.InsertCredentials(credentials);
+            
         }
 
 
@@ -46,7 +55,8 @@ namespace WebApplication1.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<Credentials>> ValidateCredentials(Credentials credentials)
         {
-            return await credentialServices.ValidateCredentials(credentials);
+            if (credentialServices.ValidateCredentials(credentials) == null) return NotFound();
+            return Ok();
         }
 
         

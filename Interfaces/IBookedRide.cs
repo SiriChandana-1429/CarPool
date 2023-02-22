@@ -6,9 +6,9 @@ namespace Interfaces
     public interface IBookedRide
     {
         public bool ValidateRide(string offerId);
-        public Task<ActionResult<BookedRide>> AddBookRide(BookedRide bookedRide);
-        public Task<ActionResult<List<BookedRide>>> GetAllRides();
-        public Task<ActionResult<BookedRide>> GetRideById(int id);
+        public BookedRide AddBookRide(BookedRide bookedRide);
+        public List<BookedRide> GetAllRides();
+        public BookedRide GetRideById(int id);
         
     }
 }

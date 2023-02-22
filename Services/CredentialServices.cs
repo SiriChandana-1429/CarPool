@@ -8,7 +8,7 @@ using WebApplication1.Models;
 namespace WebApplication1.Services
 {
     
-    public class CredentialServices:ControllerBase, ICredentials
+    public class CredentialServices: ICredentials
     {
         private readonly MyDbContext _context;
 
@@ -16,68 +16,68 @@ namespace WebApplication1.Services
         {
             _context = context;
         }
-        public async Task<ActionResult<Credentials>> ValidateCredentials(Credentials credentials)
+        public Credentials ValidateCredentials(Credentials credentials)
         {
             var check = _context.Credentials.Where(i => i.Email.Equals(credentials.Email) && (i.Password.Equals(credentials.Password)));
             if (!check.Any())
             {
-                return NotFound();
+                return null ;
             }
             else
             {
-                return Ok(credentials);
+                return credentials;
             }
         }
-        public async void InsertCredentials(Credentials credentials)
+        public void InsertCredentials(Credentials credentials)
         {
             _context.Credentials.Add(credentials);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
             //return CreatedAtAction(nameof(GetCredentialsById), new { id = credentials.Id }, credentials);
         }
-        public async Task<ActionResult<List<Credentials>>> GetCredentials()
+        public List<Credentials> GetCredentials()
         {
-            return await _context.Credentials.ToListAsync();
+            return _context.Credentials.ToList();
         }
-        public async Task<ActionResult> UpdateCredentials(Credentials credentials,int id)
+        public bool UpdateCredentials(Credentials credentials,int id)
         {
             if (id != credentials.Id)
             {
-                return BadRequest();
+                return false;
             }
             _context.Entry(credentials).State = EntityState.Modified;
             try
             {
-                await _context.SaveChangesAsync();
+                _context.SaveChanges();
             }
             catch (DbUpdateConcurrencyException)
             {
                 if (!CredentialsExists(id))
                 {
-                    return NotFound();
+                    return false;
                 }
                 else
                 {
                     throw;
                 }
             }
-            return NoContent();
+            return true;
 
         }
-        public async Task<ActionResult> DeleteCredentials(int id)
+        public bool DeleteCredentials(int id)
         {
             if (_context.Credentials == null)
             {
-                return NotFound();
+                return false;
 
             }
-            var check = await _context.Credentials.FindAsync(id);
+            var check = _context.Credentials.Find(id);
             if (check == null)
             {
-                return NotFound();
+                return false;
             }
             _context.Credentials.Remove(check);
-            await _context.SaveChangesAsync();
-            return NoContent();
+            _context.SaveChangesAsync();
+            return true;
 
         }
         private bool CredentialsExists(int id)
@@ -85,16 +85,16 @@ namespace WebApplication1.Services
             return (_context.Credentials?.Any(e => e.Id == id)).GetValueOrDefault();
         
         }
-        public async Task<ActionResult<Credentials>> GetCredentialsById(int id)
+        public Credentials GetCredentialsById(int id)
         {
             if (_context.Credentials == null)
             {
-                return NotFound();
+                return null;
             }
-            var check = await _context.Credentials.FindAsync(id);
+            var check = _context.Credentials.Find(id);
             if (check == null)
             {
-                return NotFound();
+                return null;
             }
             else
             {

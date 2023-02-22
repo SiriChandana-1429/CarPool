@@ -19,15 +19,23 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public async Task<ActionResult<List<OfferedRide>>> GetOfferedRides()
         {
-            return await offeredRideServices.GetOfferRide();
+            if (offeredRideServices.GetOfferRide() == null)
+            {
+                return NotFound();
+            }
+            return  Ok(offeredRideServices.GetOfferRide());
         }
 
         // GET: api/OfferedRides/5
         [HttpGet("{id}")]
         public async Task<ActionResult<OfferedRide>> GetOfferedRide(int id)
         {
+            if(offeredRideServices.GetOfferRideById(id) == null)
+            {
+                return NotFound();
+            }
 
-            return await offeredRideServices.GetOfferRideById(id);
+            return Ok(offeredRideServices.GetOfferRideById(id));
         }
 
 

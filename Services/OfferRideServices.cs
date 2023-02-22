@@ -1,42 +1,42 @@
 ﻿using DatabaseContext;
 using Interfaces;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using WebApplication1.Models;
 
 namespace WebApplication1.Services
 {
-    public class OfferedRideServices:ControllerBase,IOfferedRide
+    public class OfferedRideServices:IOfferedRide
     {
         private readonly MyDbContext _context;
-
+        
         public OfferedRideServices(MyDbContext context)
         {
             _context = context;
         }
-        public async void AddOfferRide(OfferedRide offeredRide)
+        public void AddOfferRide(OfferedRide offeredRide)
         {
-            offeredRide.AccomodatedString = String.Concat(Enumerable.Repeat(offeredRide.NoOfSeats.ToString(), 4));
+            int FromStop = (int)Enum.Parse(typeof(Stop), offeredRide.From);
+            int ToStop = (int)Enum.Parse(typeof(Stop), offeredRide.To);
+            offeredRide.AccomodatedString = String.Concat(Enumerable.Repeat(offeredRide.NoOfSeats.ToString(), ToStop-FromStop));
             _context.OfferedRides.Add(offeredRide);
-            await _context.SaveChangesAsync();
+            _context.SaveChangesAsync();
+            
 
            // return CreatedAtAction("GetOfferedRide", new { id = offeredRide.Id }, offeredRide);
         }
-        public async Task<ActionResult<List<OfferedRide>>> GetOfferRide()
+        public List<OfferedRide> GetOfferRide()
         {
-            return await _context.OfferedRides.ToListAsync();
+            return _context.OfferedRides.ToList();
         }
-        public async Task<ActionResult<OfferedRide>> GetOfferRideById(int id)
+        public OfferedRide GetOfferRideById(int id)
         {
             if (_context.OfferedRides == null)
             {
-                return NotFound();
+                return null;
             }
-            var check = await _context.OfferedRides.FindAsync(id);
+            var check = _context.OfferedRides.Find(id);
             if (check == null)
             {
-                return NotFound();
+                return null;
             }
             else
             {
