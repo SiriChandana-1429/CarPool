@@ -28,19 +28,30 @@ namespace WebApplication1.Services
         }
         public BookedRide AddBookRide(BookedRide bookedRide)
         {
+            
             bool Flag = true;
             char currentSeats;
-            if (ValidateRide(bookedRide.OfferId))
-            {
-                int FromStop= (int)Enum.Parse(typeof(Stop),bookedRide.From);
-                int ToStop = (int)Enum.Parse(typeof(Stop), bookedRide.To);
+           
+                //int FromStop= (int)Enum.Parse(typeof(Stops),bookedRide.From);
+                //int ToStop = (int)Enum.Parse(typeof(Stops), bookedRide.To);
                 foreach(var offer in _context.OfferedRides)
                 {
-                    if (offer.AccomodatedString.Length < ToStop)
+                List<string> TotalStops = new List<string>
+            {
+                offer.From,
+            };
+                foreach (string stop in offer.IntermediateStops.Split(","))
+                {
+                    TotalStops.Add(stop);
+                }
+                TotalStops.Add(offer.To);
+                int FromStop = TotalStops.IndexOf(offer.From);
+                int ToStop = TotalStops.IndexOf(offer.To);
+                if (offer.AccomodatedString.Length < ToStop)
                     {
                         break;
                     }
-                    foreach(char seat in offer.AccomodatedString.Substring(FromStop, ToStop))
+                    foreach(char seat in offer.AccomodatedString.Substring(FromStop, ToStop-FromStop))
                     {
                         if ((int)seat < bookedRide.seats)
                         {
@@ -51,9 +62,12 @@ namespace WebApplication1.Services
                     }
                     if (Flag)
                     {
-                        string changedSeats = String.Concat(Enumerable.Repeat(offer.AccomodatedString[FromStop].ToString(), ToStop-FromStop));
-                        string currentAccomodatedString = offer.AccomodatedString.Substring(0, FromStop)+changedSeats+offer.AccomodatedString.Substring(ToStop,offer.AccomodatedString.Length-1);
+                        string changedSeats = String.Concat(Enumerable.Repeat(FromStop.ToString(), ToStop-FromStop));
+                    
+                        string currentAccomodatedString = offer.AccomodatedString.Substring(0, FromStop-1)+changedSeats+offer.AccomodatedString[ToStop..(offer.AccomodatedString.Length)];
                         offer.AccomodatedString = currentAccomodatedString;
+                        bookedRide.OfferId = offer.OfferedRideId;
+                        
                         _context.BookedRides.Add(bookedRide);
                         _context.SaveChangesAsync();
                         return bookedRide;
@@ -61,11 +75,7 @@ namespace WebApplication1.Services
                 }
                 return null;
                 
-            }
-            else
-            {
-                return null;
-            }
+           
         }
         public List<BookedRide> GetAllRides()
         {
@@ -87,7 +97,7 @@ namespace WebApplication1.Services
                 return check;
             }
         }
-        public bool IsInPath(string path,string requiredPath)
+        public bool IsInPath(string path,string requiredPath,BookedRide bookedRide)
         {
             
             foreach (OfferedRide offer in _context.OfferedRides)
@@ -99,14 +109,60 @@ namespace WebApplication1.Services
                     completePath += IntermediateStopsArray[i].ToString();
                 }
                 completePath += offer.To;
-                if (completePath.Contains(requiredPath))
+                (int,int) stops=IsValidPath(completePath, path);
+                if (stops.Item1 == -1 || stops.Item2 == -1)
                 {
+                    return false;
+                }
+                if(stops.Item1>stops.Item2)
+                {
+                    return false;
+                }
+                else
+                {
+                    foreach(char c in offer.AccomodatedString.Substring(stops.Item1, stops.Item2-stops.Item1))
+                    {
+                        if((int)c==0)
+                        {
+                            return false;
+                        }
+                        
+                    }
+                    string temp = "";
+                    for(int i=stops.Item1;i<stops.Item2; i++)
+                    {
+                        int curr = (int)offer.AccomodatedString[i]-bookedRide.seats;
+                        temp += curr.ToString();
+
+                    }
+                    offer.AccomodatedString.Replace(offer.AccomodatedString.Substring(stops.Item1, stops.Item2-stops.Item1), temp);
                     return true;
+                    
                 }
                
             }
             return false;
         }
-
+        
+        public (int,int) IsValidPath(string string1,string string2)
+        {
+            char FirstStop = string2[0];
+            int flag1 = -1;
+            int flag2=-1;
+            char SecondStop = string2[1];
+            for(int i=0;i<string1.Length;i++)
+            {
+                if (string1[i].Equals(FirstStop))
+                {
+                    flag1 = i;
+                }
+                if (string1[i].Equals(SecondStop))
+                {
+                    flag2 = i;
+                }
+            }
+            
+            return (flag1, flag2);
+        }
     }
 }

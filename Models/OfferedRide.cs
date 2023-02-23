@@ -12,5 +12,6 @@
         public string? AccomodatedString { get; set; }
         public int NoOfSeats { get; set; }
         public string IntermediateStops { get; set; }
+        
     }
 }

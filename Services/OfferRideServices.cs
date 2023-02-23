@@ -1,5 +1,6 @@
 ﻿using DatabaseContext;
 using Interfaces;
+using System;
 using WebApplication1.Models;
 
 namespace WebApplication1.Services
@@ -14,9 +15,18 @@ namespace WebApplication1.Services
         }
         public void AddOfferRide(OfferedRide offeredRide)
         {
-            int FromStop = (int)Enum.Parse(typeof(Stop), offeredRide.From);
-            int ToStop = (int)Enum.Parse(typeof(Stop), offeredRide.To);
-            offeredRide.AccomodatedString = String.Concat(Enumerable.Repeat(offeredRide.NoOfSeats.ToString(), ToStop-FromStop));
+            List<string> TotalStops = new List<string>
+            {
+                offeredRide.From,
+            };
+            foreach (string stop in offeredRide.IntermediateStops.Split(","))
+            {
+                TotalStops.Add(stop);
+            }
+            TotalStops.Add(offeredRide.To);
+            int FromStop = TotalStops.IndexOf(offeredRide.From);
+            int ToStop = TotalStops.IndexOf(offeredRide.To);
+            offeredRide.AccomodatedString = String.Concat(Enumerable.Repeat(offeredRide.NoOfSeats.ToString(), ToStop-FromStop+1));
             _context.OfferedRides.Add(offeredRide);
             _context.SaveChangesAsync();
             

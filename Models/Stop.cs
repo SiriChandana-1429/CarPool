@@ -1,16 +1,13 @@
-﻿namespace WebApplication1.Models
-{
-    public class Stop
-    {
- 
-        public enum Stops
-        {
-            one,
-            two,
-            three,
-            four,
-            five,
-            six
-        }
-    }
-}
+﻿//namespace WebApplication1.Models
+//{
+
+//        public enum Stops
+//        {
+//            one=1,
+//            two,
+//            three,
+//            four,
+//            five,
+//            six
+//        }
+//    }
