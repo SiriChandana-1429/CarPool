@@ -31,27 +31,24 @@ namespace WebApplication1.Services
             
             bool Flag = true;
             char currentSeats;
-           
-                //int FromStop= (int)Enum.Parse(typeof(Stops),bookedRide.From);
-                //int ToStop = (int)Enum.Parse(typeof(Stops), bookedRide.To);
-                foreach(var offer in _context.OfferedRides)
+                    foreach(var offer in _context.OfferedRides)
+                    {
+                    List<string> TotalStops = new List<string>
                 {
-                List<string> TotalStops = new List<string>
-            {
-                offer.From,
-            };
-                foreach (string stop in offer.IntermediateStops.Split(","))
-                {
-                    TotalStops.Add(stop);
-                }
+                    offer.From,
+                };
+                    foreach (string stop in offer.IntermediateStops.Split(","))
+                    {
+                        TotalStops.Add(stop);
+                    }
                 TotalStops.Add(offer.To);
-                int FromStop = TotalStops.IndexOf(offer.From);
-                int ToStop = TotalStops.IndexOf(offer.To);
-                if (offer.AccomodatedString.Length < ToStop)
+                int FromStop = TotalStops.IndexOf(bookedRide.From);
+                int ToStop = TotalStops.IndexOf(bookedRide.To);
+                if (offer.AccomodatedString.Length <= ToStop)
                     {
                         break;
                     }
-                    foreach(char seat in offer.AccomodatedString.Substring(FromStop, ToStop-FromStop))
+                    foreach(char seat in offer.AccomodatedString.Substring(FromStop, ToStop - FromStop - 1))
                     {
                         if ((int)seat < bookedRide.seats)
                         {
@@ -62,9 +59,10 @@ namespace WebApplication1.Services
                     }
                     if (Flag)
                     {
-                        string changedSeats = String.Concat(Enumerable.Repeat(FromStop.ToString(), ToStop-FromStop));
+                        int value = (offer.AccomodatedString[FromStop]-'0')-bookedRide.seats;
+                        string changedSeats = String.Concat(Enumerable.Repeat(value.ToString(), ToStop-FromStop));
                     
-                        string currentAccomodatedString = offer.AccomodatedString.Substring(0, FromStop-1)+changedSeats+offer.AccomodatedString[ToStop..(offer.AccomodatedString.Length)];
+                        string currentAccomodatedString = offer.AccomodatedString.Substring(0, FromStop)+changedSeats+offer.AccomodatedString[ToStop..(offer.AccomodatedString.Length)];
                         offer.AccomodatedString = currentAccomodatedString;
                         bookedRide.OfferId = offer.OfferedRideId;
                         
@@ -120,7 +118,7 @@ namespace WebApplication1.Services
                 }
                 else
                 {
-                    foreach(char c in offer.AccomodatedString.Substring(stops.Item1, stops.Item2-stops.Item1))
+                    foreach(char c in offer.AccomodatedString.Substring(stops.Item1-1, stops.Item2-stops.Item1-1))
                     {
                         if((int)c==0)
                         {
@@ -135,7 +133,7 @@ namespace WebApplication1.Services
                         temp += curr.ToString();
 
                     }
-                    offer.AccomodatedString.Replace(offer.AccomodatedString.Substring(stops.Item1, stops.Item2-stops.Item1), temp);
+                    offer.AccomodatedString.Replace(offer.AccomodatedString.Substring(stops.Item1 - 1, stops.Item2-stops.Item1-1), temp);
                     return true;
                     
                 }

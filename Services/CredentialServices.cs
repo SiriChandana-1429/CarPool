@@ -1,7 +1,5 @@
 ﻿using DatabaseContext;
 using Interfaces;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Models;
 
